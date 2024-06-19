@@ -25,4 +25,6 @@ class MoleculePropertyClassifier(Module):
         v = self.relu(v)
         v = self.dropout(v)
 
+        v = self.classifier(v)
+
         return v, F.sigmoid(v)
