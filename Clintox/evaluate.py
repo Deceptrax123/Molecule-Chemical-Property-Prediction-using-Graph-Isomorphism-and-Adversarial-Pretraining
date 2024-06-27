@@ -1,5 +1,5 @@
 import torch
-from HIV.hiv_dataset import HIVDataset
+from Clintox.clintox_dataset import ClintoxDataset
 from torch_geometric.loader import DataLoader
 from torch_geometric.graphgym import init_weights
 from metrics import classification_binary_metrics
@@ -47,7 +47,7 @@ if __name__ == '__main__':
         'shuffle': True
     }
 
-    test_set = HIVDataset(fold_key='val', root=os.getenv(
+    test_set = ClintoxDataset(fold_key='val', root=os.getenv(
         "graph_files")+"/val"+"/data/")
     test_loader = DataLoader(test_set, **params)
 
