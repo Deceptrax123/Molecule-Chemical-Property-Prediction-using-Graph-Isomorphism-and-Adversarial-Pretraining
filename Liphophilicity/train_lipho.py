@@ -75,7 +75,8 @@ def training_loop():
             })
 
             if (epoch+1) % 10 == 0:
-                weights_path = f"HIV/weights/run_1/model_{epoch+1}.pth"
+                weights_path = f"Liphophilicity/weights/run_1/model_{
+                    epoch+1}.pth"
                 torch.save(model.state_dict(), weights_path)
 
 

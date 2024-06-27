@@ -1,5 +1,5 @@
 import torch
-from HIV.hiv_dataset import HIVDataset
+from Liphophilicity.lipho_dataset import LiphophilicityDataset
 from torch_geometric.loader import DataLoader
 from Model.model_classification import MoleculePropertyClassifier
 from Model.ismorphism import GCNEncoder
@@ -34,7 +34,7 @@ if __name__ == '__main__':
         'shuffle': True
     }
 
-    test_set = HIVDataset(fold_key='val', root=os.getenv(
+    test_set = LiphophilicityDataset(fold_key='val', root=os.getenv(
         "graph_files")+"/val"+"/data/")
     test_loader = DataLoader(test_set, **params)
 
