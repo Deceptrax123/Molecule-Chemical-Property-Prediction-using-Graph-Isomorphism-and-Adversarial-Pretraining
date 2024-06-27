@@ -5,10 +5,10 @@ import torch.nn.functional as F
 
 
 class MoleculePropertyClassifier(Module):
-    def __init__(self, num_labels):
+    def __init__(self, num_labels,encoder):
         super(MoleculePropertyClassifier, self).__init__()
 
-        self.nn = GraphIsomorphismNetwork()
+        self.nn = GraphIsomorphismNetwork(encoder=encoder)
         self.linear1 = Linear(in_features=512, out_features=256)
         self.classifier = Linear(in_features=256, out_features=num_labels)
 

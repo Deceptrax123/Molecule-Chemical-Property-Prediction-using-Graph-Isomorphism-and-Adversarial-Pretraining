@@ -23,12 +23,12 @@ class GCNEncoder(Module):
 
 
 class GraphIsomorphismNetwork(Module):
-    def __init__(self):
+    def __init__(self,encoder):
         super(GraphIsomorphismNetwork, self).__init__()
         self.gin1 = GINConv(nn=PhiLinearMapping(86, 128))
         self.gin2 = GINConv(nn=PhiLinearMapping(128, 256))
         self.gin3 = GINConv(nn=PhiLinearMapping(256, 512))
-        self.gcn_enc = GCNEncoder()
+        self.gcn_enc = encoder
 
     def forward(self, v, edges):
         v1, v2, v3 = self.gcn_enc.forward(v, edge_index=edges)
