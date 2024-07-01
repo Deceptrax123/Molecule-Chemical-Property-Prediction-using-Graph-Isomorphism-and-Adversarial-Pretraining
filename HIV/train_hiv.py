@@ -40,11 +40,11 @@ def train_epoch():
 
         acc, f1, prec, rec, auc = classification_binary_metrics(
             predictions, target_col)
-        epoch_acc += acc
-        epoch_prec += prec
-        epoch_f1 += f1
-        epoch_rec += rec
-        epoch_auc += auc
+        epoch_acc += acc.item()
+        epoch_prec += prec.item()
+        epoch_f1 += f1.item()
+        epoch_rec += rec.item()
+        epoch_auc += auc.item()
 
         del graphs, predictions, logits
         gc.collect()
@@ -73,11 +73,11 @@ def test_epoch():
 
         acc, f1, prec, rec, auc = classification_binary_metrics(
             predictions, target_col)
-        epoch_acc += acc
-        epoch_prec += prec
-        epoch_f1 += f1
-        epoch_rec += rec
-        epoch_auc += auc
+        epoch_acc += acc.item()
+        epoch_prec += prec.item()
+        epoch_f1 += f1.item()
+        epoch_rec += rec.item()
+        epoch_auc += auc.item()
 
         del graphs, predictions, logits
         gc.collect()
