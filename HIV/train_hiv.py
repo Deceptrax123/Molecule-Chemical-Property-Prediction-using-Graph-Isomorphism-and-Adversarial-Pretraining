@@ -27,10 +27,11 @@ def train_epoch():
         logits, predictions = model(
             graphs.x, edges=graphs.edge_index, batch=graphs.batch)
 
+        target_col = graphs.y.view(graphs.y.size(0), 1)
         # Train the model
         model.zero_grad()
         loss_function = nn.BCEWithLogitsLoss()
-        loss = loss_function(logits, graphs.y)
+        loss = loss_function(logits, target_col.float())
 
         loss.backward()
         optimizer.step()
@@ -38,12 +39,12 @@ def train_epoch():
         epoch_loss += loss.item()
 
         acc, f1, prec, rec, auc = classification_binary_metrics(
-            predictions, graphs.y)
-        epoch_acc += acc.item()
-        epoch_prec += prec.item()
-        epoch_f1 += f1.item()
-        epoch_rec += rec.item()
-        epoch_auc += auc.item()
+            predictions, target_col)
+        epoch_acc += acc
+        epoch_prec += prec
+        epoch_f1 += f1
+        epoch_rec += rec
+        epoch_auc += auc
 
         del graphs, predictions, logits
         gc.collect()
@@ -64,18 +65,19 @@ def test_epoch():
         logits, predictions = model(
             graphs.x, edges=graphs.edge_index, batch=graphs.batch)
 
+        target_col = graphs.y.view(graphs.y.size(0), 1)
         loss_function = nn.BCEWithLogitsLoss()
-        loss = loss_function(logits, graphs.y)
+        loss = loss_function(logits, target_col.float())
 
         epoch_loss += loss.item()
 
         acc, f1, prec, rec, auc = classification_binary_metrics(
-            predictions, graphs.y)
-        epoch_acc += acc.item()
-        epoch_prec += prec.item()
-        epoch_f1 += f1.item()
-        epoch_rec += rec.item()
-        epoch_auc += auc.item()
+            predictions, target_col)
+        epoch_acc += acc
+        epoch_prec += prec
+        epoch_f1 += f1
+        epoch_rec += rec
+        epoch_auc += auc
 
         del graphs, predictions, logits
         gc.collect()
@@ -141,20 +143,20 @@ if __name__ == '__main__':
     train_set1 = HIVDataset(
         fold_key=train_folds[0], root=os.getenv("graph_files")+"/Fold1"+"/data/", start=0)
     train_set2 = HIVDataset(fold_key=train_folds[1], root=os.getenv("graph_files")+"/Fold2/"
-                            + "/data/", start=31182)
+                            + "/data/", start=5141)
     train_set3 = HIVDataset(fold_key=train_folds[2], root=os.getenv("graph_files")+"/Fold3/"
-                            + "/data/", start=62364)
+                            + "/data/", start=10282)
     train_set4 = HIVDataset(fold_key=train_folds[3], root=os.getenv("graph_files")+"/Fold4/"
-                            + "/data/", start=93546)
+                            + "/data/", start=15423)
     train_set5 = HIVDataset(fold_key=train_folds[4], root=os.getenv("graph_files")+"/Fold5/"
-                            + "/data/", start=124728)
+                            + "/data/", start=20564)
     train_set6 = HIVDataset(fold_key=train_folds[5], root=os.getenv("graph_files")+"/Fold6/"
-                            + "/data/", start=155910)
+                            + "/data/", start=25705)
 
     test_set1 = HIVDataset(fold_key=test_folds[0], root=os.getenv("graph_files")+"/Fold7/"
-                           + "/data/", start=187092)
+                           + "/data/", start=30846)
     test_set2 = HIVDataset(fold_key=test_folds[1], root=os.getenv(
-        "graph_files")+"/Fold8"+"/data/", start=218274)
+        "graph_files")+"/Fold8"+"/data/", start=35987)
 
     train_set = ConcatDataset(
         [train_set1, train_set2, train_set3, train_set4, train_set5, train_set6])
@@ -177,7 +179,8 @@ if __name__ == '__main__':
 
     r_enc = GCNEncoder()
     # Load pre-trained weights here
-    r_enc.load_state_dict(torch.load(""))
+    extractor = os.getenv("zinc_weights")
+    r_enc.load_state_dict(torch.load(extractor))
 
     model = MoleculePropertyClassifier(num_labels=1, encoder=r_enc)
 
@@ -189,3 +192,5 @@ if __name__ == '__main__':
 
     train_steps = (len(train_set)+params['batch_size']-1)//params['batch_size']
     test_steps = (len(test_set)+params['batch_size']-1)//params['batch_size']
+
+    training_loop()

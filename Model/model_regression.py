@@ -1,11 +1,11 @@
-from torch.nn import Module, Linear, ReLU, BatchNorm1d, Dropout1d,Tanh
+from torch.nn import Module, Linear, ReLU, BatchNorm1d, Dropout1d, Tanh
 from torch_geometric.nn import global_mean_pool
 from Model.ismorphism import GraphIsomorphismNetwork
 import torch.nn.functional as F
 
 
 class MoleculePropertyRegression(Module):
-    def __init__(self, num_labels,encoder):
+    def __init__(self, num_labels, encoder):
         super(MoleculePropertyRegression, self).__init__()
 
         self.nn = GraphIsomorphismNetwork(encoder=encoder)
@@ -17,7 +17,7 @@ class MoleculePropertyRegression(Module):
         self.dropout = Dropout1d(p=0.3)
 
     def forward(self, v, edges, batch):
-        v = self.nn.forward(v, edge_index=edges)
+        v = self.nn.forward(v, edges)
         v = global_mean_pool(v, batch=batch)  # Graph View
 
         v = self.linear1(v)

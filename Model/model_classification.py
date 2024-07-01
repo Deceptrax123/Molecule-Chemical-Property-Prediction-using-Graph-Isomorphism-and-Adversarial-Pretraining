@@ -5,7 +5,7 @@ import torch.nn.functional as F
 
 
 class MoleculePropertyClassifier(Module):
-    def __init__(self, num_labels,encoder):
+    def __init__(self, num_labels, encoder):
         super(MoleculePropertyClassifier, self).__init__()
 
         self.nn = GraphIsomorphismNetwork(encoder=encoder)
@@ -17,7 +17,7 @@ class MoleculePropertyClassifier(Module):
         self.dropout = Dropout1d(p=0.3)
 
     def forward(self, v, edges, batch):
-        v = self.nn.forward(v, edge_index=edges)
+        v = self.nn.forward(v, edges)
         v = global_mean_pool(v, batch=batch)  # Graph View
 
         v = self.linear1(v)

@@ -23,7 +23,7 @@ class GCNEncoder(Module):
 
 
 class GraphIsomorphismNetwork(Module):
-    def __init__(self,encoder):
+    def __init__(self, encoder):
         super(GraphIsomorphismNetwork, self).__init__()
         self.gin1 = GINConv(nn=PhiLinearMapping(86, 128))
         self.gin2 = GINConv(nn=PhiLinearMapping(128, 256))
@@ -31,7 +31,7 @@ class GraphIsomorphismNetwork(Module):
         self.gcn_enc = encoder
 
     def forward(self, v, edges):
-        v1, v2, v3 = self.gcn_enc.forward(v, edge_index=edges)
+        v1, v2, v3 = self.gcn_enc.forward(v, edges)
         x1 = F.relu(self.gin1(v, edge_index=edges))
         xv1 = torch.add(x1, v1)
 
