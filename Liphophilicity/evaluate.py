@@ -7,7 +7,7 @@ import torch.multiprocessing as tmp
 from dotenv import load_dotenv
 from torch import nn
 import os
-import numpy as np
+import math
 import gc
 
 
@@ -17,8 +17,8 @@ def evaluate():
     for step, graphs in enumerate(test_loader):
         logits, predictions = model(
             graphs.x, edges=graphs.edge_index, batch=graphs.batch)
-
-        epoch_mse += mse(graphs.y, predictions).item()
+        target_col = graphs.y.view(graphs.y.size(0), 1)
+        epoch_mse += mse(predictions, target_col.float()).item()
 
         del graphs, predictions, logits
         gc.collect()
@@ -30,26 +30,27 @@ if __name__ == '__main__':
     load_dotenv('.env')
 
     params = {
-        'batch_size': 16,
+        'batch_size': 64,
         'shuffle': True
     }
 
-    test_set = LiphophilicityDataset(fold_key='val', root=os.getenv(
-        "graph_files")+"/val"+"/data/")
+    test_set = LiphophilicityDataset(fold_key='Fold8', root=os.getenv(
+        "graph_files")+"/Fold8"+"/data/", start=3675)
     test_loader = DataLoader(test_set, **params)
 
     r_enc = GCNEncoder()
 
     model = MoleculePropertyClassifier(num_labels=1, encoder=r_enc)
     # Trained weights are loaded here
-    model.load_state_dict("")
+    model.load_state_dict(torch.load(
+        "Liphophilicity/weights/run_1/model_1000.pth"))
 
     model.eval()
     mse = nn.MSELoss()
 
     mse_loss = evaluate()
-    rmse = torch.sqrt(torch.tensor(mse_loss))
+    rmse = math.sqrt(mse_loss)
 
     print("------------Test Metrics-------------")
     print(f"Test Loss: {mse_loss}")
-    print(f"Root Mean Square Error: {rmse.item()}")
+    print(f"Root Mean Square Error: {rmse}")
