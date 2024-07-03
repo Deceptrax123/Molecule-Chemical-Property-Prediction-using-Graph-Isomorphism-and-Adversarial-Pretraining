@@ -14,7 +14,6 @@ class MoleculePropertyRegression(Module):
 
         self.relu = ReLU()
         self.bn = BatchNorm1d(num_features=256)
-        self.dropout = Dropout1d(p=0.3)
 
     def forward(self, v, edges, batch):
         v = self.nn.forward(v, edges)
@@ -23,7 +22,6 @@ class MoleculePropertyRegression(Module):
         v = self.linear1(v)
         v = self.bn(v)
         v = self.relu(v)
-        v = self.dropout(v)
 
         v = self.classifier(v)
 

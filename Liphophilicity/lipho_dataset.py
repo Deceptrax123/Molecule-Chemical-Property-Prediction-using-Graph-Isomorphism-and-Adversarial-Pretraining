@@ -10,7 +10,7 @@ import os.path as osp
 
 
 class LiphophilicityDataset(Dataset):
-    def __init__(self, fold_key, root, start, step=30000):
+    def __init__(self, fold_key, root, start, step=525):
         self.fold_key = fold_key
         self.root = root
         self.step = step
