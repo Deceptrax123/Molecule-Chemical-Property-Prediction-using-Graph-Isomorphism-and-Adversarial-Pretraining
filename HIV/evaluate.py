@@ -57,7 +57,7 @@ if __name__ == '__main__':
     model = MoleculePropertyClassifier(num_labels=1, encoder=r_enc)
     # Trained weights are loaded here
     model.load_state_dict(torch.load(
-        "/Volumes/Vault/Smudge/Torch_Hub/Chemical-Property-Isomorphism-weights/HIV/weights/run_1/model_420.pth"))
+        "HIV/weights/run_1/model_420.pth"))
 
     model.eval()
 

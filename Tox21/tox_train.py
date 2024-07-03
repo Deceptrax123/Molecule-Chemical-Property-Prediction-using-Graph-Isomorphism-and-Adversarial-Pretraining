@@ -28,9 +28,10 @@ def train_epoch():
             graphs.x, edges=graphs.edge_index, batch=graphs.batch)
 
         # Train the model
+        target_col = graphs.y.view(logits.size(0), 12)
         model.zero_grad()
         loss_function = nn.BCEWithLogitsLoss()
-        loss = loss_function(logits, graphs.y)
+        loss = loss_function(logits, target_col.float())
 
         loss.backward()
         optimizer.step()
@@ -38,14 +39,14 @@ def train_epoch():
         epoch_loss += loss.item()
 
         acc, f1, prec, rec, auc = classification_multilabel_metrics(
-            predictions, graphs.y)
+            predictions, target_col.int())
         epoch_acc += acc.item()
         epoch_prec += prec.item()
         epoch_f1 += f1.item()
         epoch_rec += rec.item()
         epoch_auc += auc.item()
 
-        del graphs, predictions, logits
+        del graphs, predictions, logits, target_col
         gc.collect()
     return epoch_loss/(step+1), epoch_acc/(step+1), epoch_prec/(step+1), epoch_rec/(step+1), epoch_f1/(step+1), \
         epoch_auc/(step+1)
@@ -63,14 +64,14 @@ def test_epoch():
     for step, graphs in enumerate(train_loader):
         logits, predictions = model(
             graphs.x, edges=graphs.edge_index, batch=graphs.batch)
-
+        target_col = graphs.y.view(logits.size(0), 12)
         loss_function = nn.BCEWithLogitsLoss()
-        loss = loss_function(logits, graphs.y)
+        loss = loss_function(logits, target_col.float())
 
         epoch_loss += loss.item()
 
         acc, f1, prec, rec, auc = classification_multilabel_metrics(
-            predictions, graphs.y)
+            predictions, target_col.int())
         epoch_acc += acc.item()
         epoch_prec += prec.item()
         epoch_f1 += f1.item()
@@ -126,7 +127,7 @@ def training_loop():
             })
 
             if (epoch+1) % 10 == 0:
-                weights_path = f"HIV/weights/run_1/model_{epoch+1}.pth"
+                weights_path = f"Tox21/weights/run_1/model_{epoch+1}.pth"
                 torch.save(model.state_dict(), weights_path)
 
 
@@ -141,27 +142,27 @@ if __name__ == '__main__':
     train_set1 = Tox21Dataset(
         fold_key=train_folds[0], root=os.getenv("graph_files")+"/Fold1"+"/data/", start=0)
     train_set2 = Tox21Dataset(fold_key=train_folds[1], root=os.getenv("graph_files")+"/Fold2/"
-                              + "/data/", start=31182)
+                              + "/data/", start=978)
     train_set3 = Tox21Dataset(fold_key=train_folds[2], root=os.getenv("graph_files")+"/Fold3/"
-                              + "/data/", start=62364)
+                              + "/data/", start=1956)
     train_set4 = Tox21Dataset(fold_key=train_folds[3], root=os.getenv("graph_files")+"/Fold4/"
-                              + "/data/", start=93546)
+                              + "/data/", start=2934)
     train_set5 = Tox21Dataset(fold_key=train_folds[4], root=os.getenv("graph_files")+"/Fold5/"
-                              + "/data/", start=124728)
+                              + "/data/", start=3912)
     train_set6 = Tox21Dataset(fold_key=train_folds[5], root=os.getenv("graph_files")+"/Fold6/"
-                              + "/data/", start=155910)
+                              + "/data/", start=4890)
 
     test_set1 = Tox21Dataset(fold_key=test_folds[0], root=os.getenv("graph_files")+"/Fold7/"
-                             + "/data/", start=187092)
+                             + "/data/", start=5868)
     test_set2 = Tox21Dataset(fold_key=test_folds[1], root=os.getenv(
-        "graph_files")+"/Fold8"+"/data/", start=218274)
+        "graph_files")+"/Fold8"+"/data/", start=6846)
 
     train_set = ConcatDataset(
         [train_set1, train_set2, train_set3, train_set4, train_set5, train_set6])
     test_set = ConcatDataset([test_set1, test_set2])
 
     params = {
-        'batch_size': 16,
+        'batch_size': 128,
         'shuffle': True,
         'num_workers': 0
     }
@@ -177,7 +178,8 @@ if __name__ == '__main__':
 
     r_enc = GCNEncoder()
     # Load pre-trained weights here
-    r_enc.load_state_dict(torch.load(""))
+    extractor = os.getenv("zinc_weights")
+    r_enc.load_state_dict(torch.load(extractor))
 
     model = MoleculePropertyClassifier(num_labels=12, encoder=r_enc)
 
@@ -189,3 +191,5 @@ if __name__ == '__main__':
 
     train_steps = (len(train_set)+params['batch_size']-1)//params['batch_size']
     test_steps = (len(test_set)+params['batch_size']-1)//params['batch_size']
+
+    training_loop()

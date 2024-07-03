@@ -10,7 +10,7 @@ import os.path as osp
 
 
 class Tox21Dataset(Dataset):
-    def __init__(self, fold_key, root, start, step=30000):
+    def __init__(self, fold_key, root, start, step=978):
         self.fold_key = fold_key
         self.root = root
         self.step = step
