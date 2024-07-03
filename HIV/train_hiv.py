@@ -163,7 +163,7 @@ if __name__ == '__main__':
     test_set = ConcatDataset([test_set1, test_set2])
 
     params = {
-        'batch_size': 16,
+        'batch_size': 256,
         'shuffle': True,
         'num_workers': 0
     }
@@ -185,12 +185,12 @@ if __name__ == '__main__':
     model = MoleculePropertyClassifier(num_labels=1, encoder=r_enc)
 
     NUM_EPOCHS = 1000
-    LR = 0.001
+    LR = 2e-4
     BETAS = (0.9, 0.999)
 
     optimizer = torch.optim.Adam(params=model.parameters(), lr=LR, betas=BETAS)
 
-    train_steps = (len(train_set)+params['batch_size']-1)//params['batch_size']
-    test_steps = (len(test_set)+params['batch_size']-1)//params['batch_size']
+    # train_steps = (len(train_set)+params['batch_size']-1)//params['batch_size']
+    # test_steps = (len(test_set)+params['batch_size']-1)//params['batch_size']
 
     training_loop()
