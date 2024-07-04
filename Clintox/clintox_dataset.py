@@ -10,11 +10,11 @@ import os.path as osp
 
 
 class ClintoxDataset(Dataset):
-    def __init__(self, fold_key, root, start, step=30000):
+    def __init__(self, fold_key, root, start, stop):
         self.fold_key = fold_key
         self.root = root
-        self.step = step
         self.start = start
+        self.stop = stop
 
         super().__init__(root)
 
@@ -22,10 +22,8 @@ class ClintoxDataset(Dataset):
     def processed_file_names(self):
         load_dotenv(".env")
 
-        l = self.step
-
         processed_names = list()
-        for n in range(self.start, self.start+l):
+        for n in range(self.start, self.stop+1):
             processed_names.append('data_'+str(n)+'.pt')
 
         return processed_names
@@ -36,7 +34,7 @@ class ClintoxDataset(Dataset):
 
         directory = os.getenv(self.fold_key)
 
-        return [os.path.join(directory, file) for file in os.listdir(directory)[self.start:self.start+self.step]]
+        return [os.path.join(directory, file) for file in os.listdir(directory)[self.start:self.stop+1]]
 
     def len(self):
         return len(self.processed_file_names)

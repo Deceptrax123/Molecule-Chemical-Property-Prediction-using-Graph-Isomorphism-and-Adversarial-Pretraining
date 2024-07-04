@@ -27,10 +27,11 @@ def train_epoch():
         logits, predictions = model(
             graphs.x, edges=graphs.edge_index, batch=graphs.batch)
 
+        target_col = graphs.y.view(graphs.y.size(0), 1)
         # Train the model
         model.zero_grad()
         loss_function = nn.BCEWithLogitsLoss()
-        loss = loss_function(logits, graphs.y)
+        loss = loss_function(logits, target_col.float())
 
         loss.backward()
         optimizer.step()
@@ -38,7 +39,7 @@ def train_epoch():
         epoch_loss += loss.item()
 
         acc, f1, prec, rec, auc = classification_binary_metrics(
-            predictions, graphs.y)
+            predictions, target_col.int())
         epoch_acc += acc.item()
         epoch_prec += prec.item()
         epoch_f1 += f1.item()
@@ -63,14 +64,15 @@ def test_epoch():
     for step, graphs in enumerate(train_loader):
         logits, predictions = model(
             graphs.x, edges=graphs.edge_index, batch=graphs.batch)
+        target_col = graphs.y.view(graphs.y.size(0), 1)
 
         loss_function = nn.BCEWithLogitsLoss()
-        loss = loss_function(logits, graphs.y)
+        loss = loss_function(logits, target_col.float())
 
         epoch_loss += loss.item()
 
         acc, f1, prec, rec, auc = classification_binary_metrics(
-            predictions, graphs.y)
+            predictions, target_col.int())
         epoch_acc += acc.item()
         epoch_prec += prec.item()
         epoch_f1 += f1.item()
@@ -126,7 +128,7 @@ def training_loop():
             })
 
             if (epoch+1) % 10 == 0:
-                weights_path = f"HIV/weights/run_1/model_{epoch+1}.pth"
+                weights_path = f"Clintox/weights/run_1/model_{epoch+1}.pth"
                 torch.save(model.state_dict(), weights_path)
 
 
@@ -139,29 +141,29 @@ if __name__ == '__main__':
     test_folds = ['Fold7', 'Fold8']
 
     train_set1 = ClintoxDataset(
-        fold_key=train_folds[0], root=os.getenv("graph_files")+"/Fold1"+"/data/", start=0)
+        fold_key=train_folds[0], root=os.getenv("graph_files")+"/Fold1"+"/data/", start=0, stop=6)
     train_set2 = ClintoxDataset(fold_key=train_folds[1], root=os.getenv("graph_files")+"/Fold2/"
-                                + "/data/", start=31182)
+                                + "/data/", start=185, stop=301)
     train_set3 = ClintoxDataset(fold_key=train_folds[2], root=os.getenv("graph_files")+"/Fold3/"
-                                + "/data/", start=62364)
+                                + "/data/", start=370, stop=554)
     train_set4 = ClintoxDataset(fold_key=train_folds[3], root=os.getenv("graph_files")+"/Fold4/"
-                                + "/data/", start=93546)
+                                + "/data/", start=555, stop=739)
     train_set5 = ClintoxDataset(fold_key=train_folds[4], root=os.getenv("graph_files")+"/Fold5/"
-                                + "/data/", start=124728)
+                                + "/data/", start=740, stop=924)
     train_set6 = ClintoxDataset(fold_key=train_folds[5], root=os.getenv("graph_files")+"/Fold6/"
-                                + "/data/", start=155910)
+                                + "/data/", start=925, stop=1109)
 
     test_set1 = ClintoxDataset(fold_key=test_folds[0], root=os.getenv("graph_files")+"/Fold7/"
-                               + "/data/", start=187092)
+                               + "/data/", start=1110, stop=1217)
     test_set2 = ClintoxDataset(fold_key=test_folds[1], root=os.getenv(
-        "graph_files")+"/Fold8"+"/data/", start=218274)
+        "graph_files")+"/Fold8"+"/data/", start=1295, stop=1479)
 
     train_set = ConcatDataset(
         [train_set1, train_set2, train_set3, train_set4, train_set5, train_set6])
     test_set = ConcatDataset([test_set1, test_set2])
 
     params = {
-        'batch_size': 16,
+        'batch_size': 128,
         'shuffle': True,
         'num_workers': 0
     }
@@ -177,7 +179,8 @@ if __name__ == '__main__':
 
     r_enc = GCNEncoder()
     # Load pre-trained weights here
-    r_enc.load_state_dict(torch.load(""))
+    extractor = os.getenv("zinc_weights")
+    r_enc.load_state_dict(torch.load(extractor))
 
     model = MoleculePropertyClassifier(num_labels=1, encoder=r_enc)
 
@@ -187,5 +190,4 @@ if __name__ == '__main__':
 
     optimizer = torch.optim.Adam(params=model.parameters(), lr=LR, betas=BETAS)
 
-    train_steps = (len(train_set)+params['batch_size']-1)//params['batch_size']
-    test_steps = (len(test_set)+params['batch_size']-1)//params['batch_size']
+    training_loop()
