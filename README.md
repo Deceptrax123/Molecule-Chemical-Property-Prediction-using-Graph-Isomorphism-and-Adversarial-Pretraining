@@ -8,7 +8,7 @@
   ```sh
   pip install -r requirements.txt
   ```
-- The weights for the pre-trained spectral backbone can be downloaded from our release. The weights are saved as ```.pt``` files which can directly be loaded in the training scripts. The procedures used for pre-training the backbone can be found <a href="https://github.com/Deceptrax123/Molecular-Graph-Representation-Learning-through-Adversarial-Training">here</a>
+- The weights for the pre-trained spectral backbone can be downloaded from our <a href="https://github.com/Deceptrax123/Defending-Graph-Neural-Networks-against-Adversarial-Attacks/releases/tag/v1.0">release</a>. The weights are saved as ```.pt``` files which can directly be loaded in the training scripts. The procedures used for pre-training the backbone can be found <a href="https://github.com/Deceptrax123/Molecular-Graph-Representation-Learning-through-Adversarial-Training">here</a>
 - Load the pre-trained weights in the ```train.py``` file of each dataset folder. Each train file is named as per the dataset, change the name of the script accordingly before running.
 - Before running the train scripts, insert the paths for the location of the saved graph tensors and the pre-trained backbone. A detailed list of keys used in the ```.env``` file is given below. 
 - Change the path for saving the model based on your convenience. Ensure that the folder is created before saving the models.
