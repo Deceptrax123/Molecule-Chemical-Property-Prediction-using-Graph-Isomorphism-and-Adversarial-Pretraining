@@ -20,4 +20,4 @@
 |zinc_weights|/path/to/zinc/pretrained.pt|
 |graph_files|path/to/graphs/data/processed/|
 
-We will release the weights for the trained models soon. 
+We will release the weights for the trained models soon. You may send an email or raise an issue if there are any bugs. Have fun!!!
